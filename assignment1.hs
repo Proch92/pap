@@ -58,5 +58,41 @@ matchSeq (Star:(Star:xs)) (Star:(Dot:ys)) = False
 matchSeq [] (Star:ys) = False
 matchSeq (Star:xs) [] = False
 
+{-
 --------- occ --------------------------
 occ :: [Elem] -> [(Int, [Int])]
+occ [] = []
+occ (Star:xs) = (, ) : occ xs
+occ (Dot:xs) = 
+-}
+
+-------------- bst ---------------
+data BSTree a = Nil | Node a (BSTree a) (BSTree a)
+
+countStarInTree :: BSTree Elem -> Int
+countStarInTree Nil = 0
+countStarInTree (Node Star sx dx) = 1 + countStarInTree sx + countStarInTree dx
+countStarInTree (Node Dot sx dx) = countStarInTree sx + countStarInTree dx
+
+testTree :: BSTree Elem
+testTree = (Node Dot
+				(Node Star
+					(Node Star 
+						(Node Dot Nil Nil)
+					Nil)
+					(Node Star Nil Nil))
+				(Node Star
+					(Node Star 
+						(Node Star Nil Nil)
+					Nil)
+					Nil))
+
+--------------------- pathTree --------------
+pathTree :: BSTree Elem -> Int
+pathTree Nil = 0
+pathTree (Node Star sx dx)
+	| pathTree sx > pathTree dx 	= 1 + pathTree sx
+	| pathTree sx <= pathTree dx 	= 1 + pathTree dx
+pathTree (Node Dot sx dx)
+	| pathTree sx > pathTree dx 	= pathTree sx
+	| pathTree sx <= pathTree dx 	= pathTree dx
