@@ -2,7 +2,8 @@ data Elem = Dot | Star
 
 ---------------- Dichiarazione variabile "vec" ---------------
 vec :: [Elem]
-vec = [Dot, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot]
+vec = [Dot, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Star, Dot]
+vec2 = [Dot, Dot, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Star]
 
 ---------------- countStar -----------------------
 countStar :: [Elem] -> Int
@@ -29,3 +30,30 @@ zipSeq (Star:xs) = Star : zipSeq xs
 zipSeq (Dot:(Dot:xs)) = zipSeq (Dot:xs)
 zipSeq (Dot:(Star:xs)) = Dot : (Star : zipSeq xs)
 zipSeq (Dot:[]) = [Dot]
+
+----------- maxStarSeq -----------------
+countStarGroup :: [Elem] -> Int
+countStarGroup (Dot:xs) = 0
+countStarGroup [] = 0
+countStarGroup (Star:xs) = 1 + countStarGroup xs
+
+maxStarSeq :: [Elem] -> Int
+maxStarSeq [] = 0
+maxStarSeq (Star:xs) = maxStarSeq xs
+maxStarSeq (Dot:xs) 
+	| nextGroup > maxS 	= nextGroup
+	| otherwise 		= maxS
+	where
+		nextGroup = countStarGroup xs
+		maxS = maxStarSeq xs
+
+---------- matchSeq --------------------
+matchSeq :: [Elem] -> [Elem] -> Bool
+matchSeq [] [] = True
+matchSeq (Dot:xs) y = matchSeq xs y
+matchSeq x (Dot:ys) = matchSeq x ys
+matchSeq (Star:xs) (Star:ys) = matchSeq xs ys
+matchSeq (Star:(Dot:xs)) (Star:(Star:ys)) = False
+matchSeq (Star:(Star:xs)) (Star:(Dot:ys)) = False
+matchSeq [] (Star:ys) = False
+matchSeq (Star:xs) [] = False
