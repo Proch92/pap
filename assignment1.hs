@@ -57,3 +57,6 @@ matchSeq (Star:(Dot:xs)) (Star:(Star:ys)) = False
 matchSeq (Star:(Star:xs)) (Star:(Dot:ys)) = False
 matchSeq [] (Star:ys) = False
 matchSeq (Star:xs) [] = False
+
+--------- occ --------------------------
+occ :: [Elem] -> [(Int, [Int])]
