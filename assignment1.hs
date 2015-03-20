@@ -32,18 +32,18 @@ zipSeq (Dot:(Star:xs)) = Dot : (Star : zipSeq xs)
 zipSeq (Dot:[]) = [Dot]
 
 ----------- maxStarSeq -----------------
-countStarGroup :: [Elem] -> Int
-countStarGroup (Dot:xs) = 0
-countStarGroup [] = 0
-countStarGroup (Star:xs) = 1 + countStarGroup xs
+nextCl :: [Elem] -> Int
+nextCl (Dot:xs) = 0
+nextCl [] = 0
+nextCl (Star:xs) = 1 + nextCl xs
 
 maxStarSeq :: [Elem] -> Int
 maxStarSeq [] = 0
 maxStarSeq (x:xs) 
-	| nextGroup > maxS 	= nextGroup
-	| otherwise 		= maxS
+	| nextCluster > maxS 	= nextCluster
+	| otherwise 			= maxS
 	where
-		nextGroup = countStarGroup (x:xs)
+		nextCluster = nextCl (x:xs)
 		maxS = maxStarSeq xs
 
 ---------- matchSeq --------------------
@@ -89,9 +89,7 @@ testTree = (Node Dot
 --------------------- pathTree --------------
 pathTree :: BSTree Elem -> Int
 pathTree Nil = 0
+pathTree (Node Dot sx dx) = 0
 pathTree (Node Star sx dx)
 	| pathTree sx > pathTree dx 	= 1 + pathTree sx
 	| pathTree sx <= pathTree dx 	= 1 + pathTree dx
-pathTree (Node Dot sx dx)
-	| pathTree sx > pathTree dx 	= pathTree sx
-	| pathTree sx <= pathTree dx 	= pathTree dx
