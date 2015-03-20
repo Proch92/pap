@@ -2,7 +2,7 @@ data Elem = Dot | Star
 
 ---------------- Dichiarazione variabile "vec" ---------------
 vec :: [Elem]
-vec = [Dot, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Star, Dot]
+vec = [Star, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Dot]
 vec2 = [Dot, Dot, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Star]
 
 ---------------- countStar -----------------------
@@ -39,12 +39,11 @@ countStarGroup (Star:xs) = 1 + countStarGroup xs
 
 maxStarSeq :: [Elem] -> Int
 maxStarSeq [] = 0
-maxStarSeq (Star:xs) = maxStarSeq xs
-maxStarSeq (Dot:xs) 
+maxStarSeq (x:xs) 
 	| nextGroup > maxS 	= nextGroup
 	| otherwise 		= maxS
 	where
-		nextGroup = countStarGroup xs
+		nextGroup = countStarGroup (x:xs)
 		maxS = maxStarSeq xs
 
 ---------- matchSeq --------------------
