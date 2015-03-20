@@ -1,10 +1,26 @@
 data Elem = Dot | Star
+data BSTree a = Nil | Node a (BSTree a) (BSTree a)
 
----------------- Dichiarazione variabile "vec" ---------------
+---------------- Dichiarazione test ---------------
 vec :: [Elem]
+vec2 :: [Elem]
+vec3 :: [Elem]
 vec = [Star, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Dot, Star, Star, Dot]
 vec2 = [Dot, Dot, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Star]
 vec3 = [Star, Star, Dot, Dot, Dot, Star, Star]
+
+testTree :: BSTree Elem
+testTree = (Node Star
+				(Node Star
+					(Node Star 
+						(Node Dot Nil Nil)
+					Nil)
+					(Node Star Nil Nil))
+				(Node Star
+					(Node Star 
+						(Node Star Nil Nil)
+					Nil)
+					Nil))
 
 ---------------- countStar -----------------------
 countStar :: [Elem] -> Int
@@ -29,7 +45,7 @@ zipSeq :: [Elem] -> [Elem]
 zipSeq [] = []
 zipSeq (Star:xs) = Star : zipSeq xs
 zipSeq (Dot:(Dot:xs)) = zipSeq (Dot:xs)
-zipSeq (Dot:(Star:xs)) = Dot : (Star : zipSeq xs)
+zipSeq (Dot:(Star:xs)) = Dot:(Star:zipSeq xs)
 zipSeq (Dot:[]) = [Dot]
 
 ----------- maxStarSeq -----------------
@@ -51,13 +67,13 @@ maxStarSeq (x:xs)
 ---------- matchSeq --------------------
 matchSeq :: [Elem] -> [Elem] -> Bool
 matchSeq [] [] = True
+matchSeq [] (Star:ys) = False
+matchSeq (Star:xs) [] = False
 matchSeq (Dot:xs) y = matchSeq xs y
 matchSeq x (Dot:ys) = matchSeq x ys
 matchSeq (Star:xs) (Star:ys) = matchSeq xs ys
 matchSeq (Star:(Dot:xs)) (Star:(Star:ys)) = False
 matchSeq (Star:(Star:xs)) (Star:(Dot:ys)) = False
-matchSeq [] (Star:ys) = False
-matchSeq (Star:xs) [] = False
 
 
 --------- occ --------------------------
@@ -80,26 +96,11 @@ occ x
 	| countStar x > 0 = (nextCl x, getClusterPositions (nextCl x) 0 (Dot:x)) : occ (removeCluster (nextCl x) 0 x)
 	| otherwise = []
 
--------------- bst ---------------
-data BSTree a = Nil | Node a (BSTree a) (BSTree a)
-
+-------------- countInBst ---------------
 countStarInTree :: BSTree Elem -> Int
 countStarInTree Nil = 0
 countStarInTree (Node Star sx dx) = 1 + countStarInTree sx + countStarInTree dx
 countStarInTree (Node Dot sx dx) = countStarInTree sx + countStarInTree dx
-
-testTree :: BSTree Elem
-testTree = (Node Star
-				(Node Star
-					(Node Star 
-						(Node Dot Nil Nil)
-					Nil)
-					(Node Star Nil Nil))
-				(Node Star
-					(Node Star 
-						(Node Star Nil Nil)
-					Nil)
-					Nil))
 
 --------------------- pathTree --------------
 pathTree :: BSTree Elem -> Int
