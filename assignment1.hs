@@ -2,8 +2,9 @@ data Elem = Dot | Star
 
 ---------------- Dichiarazione variabile "vec" ---------------
 vec :: [Elem]
-vec = [Star, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Dot]
+vec = [Star, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Dot, Star, Star, Dot]
 vec2 = [Dot, Dot, Star, Star, Star, Dot, Dot, Dot, Dot, Star, Star, Dot, Dot, Star, Star, Star, Star]
+vec3 = [Star, Star, Dot, Dot, Dot, Star, Star]
 
 ---------------- countStar -----------------------
 countStar :: [Elem] -> Int
@@ -33,7 +34,8 @@ zipSeq (Dot:[]) = [Dot]
 
 ----------- maxStarSeq -----------------
 nextCl :: [Elem] -> Int
-nextCl (Dot:xs) = 0
+nextCl (Star:Dot:xs) = 1
+nextCl (Dot:xs) = nextCl xs
 nextCl [] = 0
 nextCl (Star:xs) = 1 + nextCl xs
 
@@ -57,13 +59,26 @@ matchSeq (Star:(Star:xs)) (Star:(Dot:ys)) = False
 matchSeq [] (Star:ys) = False
 matchSeq (Star:xs) [] = False
 
-{-
+
 --------- occ --------------------------
+getClusterPositions :: Int -> Int -> [Elem] -> [Int]
+getClusterPositions _ _ [] = []
+getClusterPositions occur pos (Dot:Star:xs)
+	| occur == nextCl (Star:xs) = (pos+1) : getClusterPositions occur (pos+2) xs
+	| otherwise = getClusterPositions occur (pos+2) xs
+getClusterPositions occur pos (_:xs) = getClusterPositions occur (pos+1) xs
+
+removeCluster :: Int -> Int -> [Elem] -> [Elem]
+removeCluster _ _ [] = []
+removeCluster occur _ (Dot:xs) = Dot:removeCluster occur 0 xs
+removeCluster occur index (Star:xs)
+	| (index + nextCl (Star:xs)) == occur = Dot:(removeCluster occur (index+1) xs)
+	| otherwise = Star:(removeCluster occur (index+1) xs)
+
 occ :: [Elem] -> [(Int, [Int])]
-occ [] = []
-occ (Star:xs) = (, ) : occ xs
-occ (Dot:xs) = 
--}
+occ x
+	| countStar x > 0 = (nextCl x, getClusterPositions (nextCl x) 0 (Dot:x)) : occ (removeCluster (nextCl x) 0 x)
+	| otherwise = []
 
 -------------- bst ---------------
 data BSTree a = Nil | Node a (BSTree a) (BSTree a)
@@ -74,7 +89,7 @@ countStarInTree (Node Star sx dx) = 1 + countStarInTree sx + countStarInTree dx
 countStarInTree (Node Dot sx dx) = countStarInTree sx + countStarInTree dx
 
 testTree :: BSTree Elem
-testTree = (Node Dot
+testTree = (Node Star
 				(Node Star
 					(Node Star 
 						(Node Dot Nil Nil)
