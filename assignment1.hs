@@ -75,7 +75,6 @@ matchSeq (Star:xs) (Star:ys) = matchSeq xs ys
 matchSeq (Star:(Dot:xs)) (Star:(Star:ys)) = False
 matchSeq (Star:(Star:xs)) (Star:(Dot:ys)) = False
 
-
 --------- occ --------------------------
 getClusterPositions :: Int -> Int -> [Elem] -> [Int]
 getClusterPositions _ _ [] = []
