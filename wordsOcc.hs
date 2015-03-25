@@ -1,0 +1,1 @@
+wordsOcc :: [Word] -> [(Int, [Word])]
