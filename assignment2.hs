@@ -71,6 +71,7 @@ instance CShape Shape where
 	getXpos (Rectangle (posx, _) _ _) = posx
 	getXpos (Circonference (posx, _) radius) = posx - radius
 	getXpos (Composition list) = foldr (\x m -> min (getXpos x) m) (maxBound :: Int) list
+	
 -------------------------- funzioni aggiuntive ------------------------------
 moveShapes :: [Shape] -> V2d -> [Shape]
 moveShapes l v = map (\x -> move x v) l
