@@ -1,4 +1,5 @@
 import GHC.Float
+import Screen
 
 type P2d = (Int, Int)
 type V2d = (Int, Int)
@@ -26,6 +27,12 @@ lesserx s1 s2
 
 getNode :: BSTree a -> a
 getNode (Node x _ _) = x
+
+pair :: [a] -> [b] -> [(a,b)]
+pair [] [] = []
+pair [] _ = error "different lengths... cannot pair"
+pair _ [] = error "different lengths... cannot pair"
+pair (x:xs) (y:ys) = (x,y):(pair xs ys)
 
 -------------------------- classe CShape ------------------------------
 
@@ -94,3 +101,35 @@ insertInTree (Node s sx dx) shape
 makeShapeTree :: [Shape] -> BSTree Shape
 makeShapeTree [] = Nil
 makeShapeTree (x:xs) = insertInTree (makeShapeTree xs) x
+
+------------------- draw stuff ----------------------------
+interpolate :: Int -> Int -> Int -> [Int] -- start, end, step
+interpolate _ end 100 = end:[]
+interpolate start end step = 
+	float2Int ((int2Float start) + ((int2Float step / 100) * int2Float (end - start)))
+	: interpolate start end (step + 1)
+
+interpolateLine :: Shape -> [IO()]
+interpolateLine (Line (ax, ay) (bx, by)) = map (\p -> writeAt p "*") (pair (interpolate ax bx 0) (interpolate ay by 0))
+
+
+class (CShape a) => Drawable a where
+	draw :: a -> IO()
+
+instance Drawable Shape where
+	draw (Line a b) = foldr (>>) (goto (0,50)) (interpolateLine (Line a b))
+	draw (Triangle a b c) = do
+		draw (Line a b)
+		draw (Line b c)
+		draw (Line a c)
+	draw (Rectangle (posx, posy) w h) = do
+		draw (Line tl tr)
+		draw (Line bl br)
+		draw (Line tl bl)
+		draw (Line tr br)
+		where
+			tl = (posx, posy)
+			tr = (posx+w, posy)
+			bl = (posx, posy+h)
+			br = (posx+w, posy+h)
+	--draw (Circonference center radius)
