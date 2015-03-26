@@ -25,9 +25,6 @@ lesserx s1 s2
 	| getXpos s1 < getXpos s2 	= True
 	| otherwise 				= False
 
-getNode :: BSTree a -> a
-getNode (Node x _ _) = x
-
 pair :: [a] -> [b] -> [(a,b)]
 pair [] [] = []
 pair [] _ = error "different lengths... cannot pair"
