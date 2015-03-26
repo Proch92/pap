@@ -34,6 +34,9 @@ pair [] _ = error "different lengths... cannot pair"
 pair _ [] = error "different lengths... cannot pair"
 pair (x:xs) (y:ys) = (x,y):(pair xs ys)
 
+deg2rad :: Int -> Float
+deg2rad deg = (int2Float deg) * (3.14159265359 / 180.0)
+
 -------------------------- classe CShape ------------------------------
 
 class CShape a where
@@ -103,15 +106,27 @@ makeShapeTree [] = Nil
 makeShapeTree (x:xs) = insertInTree (makeShapeTree xs) x
 
 ------------------- draw stuff ----------------------------
-interpolate :: Int -> Int -> Int -> [Int] -- start, end, step
-interpolate _ end 100 = end:[]
-interpolate start end step = 
+linearInterpolation :: Int -> Int -> Int -> [Int] -- start, end, step
+linearInterpolation _ end 100 = end:[]
+linearInterpolation start end step = 
 	float2Int ((int2Float start) + ((int2Float step / 100) * int2Float (end - start)))
-	: interpolate start end (step + 1)
+	: linearInterpolation start end (step + 1)
+
+sinInterpolation :: Int -> Int -> [Int]
+sinInterpolation 360 _ = 0:[]
+sinInterpolation deg radius = float2Int (sin (deg2rad deg) * (int2Float radius)) : sinInterpolation (deg + 1) radius
+
+cosInterpolation :: Int -> Int -> [Int]
+cosInterpolation 360 radius = (1 * radius):[]
+cosInterpolation deg radius = float2Int (cos (deg2rad deg) * (int2Float radius)) : cosInterpolation (deg + 1) radius
 
 interpolateLine :: Shape -> [IO()]
-interpolateLine (Line (ax, ay) (bx, by)) = map (\p -> writeAt p "*") (pair (interpolate ax bx 0) (interpolate ay by 0))
+interpolateLine (Line (ax, ay) (bx, by)) = map (\p -> writeAt p "*") (pair (linearInterpolation ax bx 0) (linearInterpolation ay by 0))
 
+interpolateRad :: Shape -> [IO()]
+interpolateRad (Circonference center radius) = map (\p -> writeAt p "*") (pair (sinInterpolation 0 radius) (cosInterpolation 0 radius))
+
+drawAll :: [Shape] -> IO()
 
 class (CShape a) => Drawable a where
 	draw :: a -> IO()
@@ -132,4 +147,10 @@ instance Drawable Shape where
 			tr = (posx+w, posy)
 			bl = (posx, posy+h)
 			br = (posx+w, posy+h)
-	--draw (Circonference center radius)
+	draw (Circonference center radius) = foldr (>>) (goto (0,50)) (interpolateRad (Circonference center radius))
+	draw (Composition list) = drawAll list
+
+drawShapes :: [Shape] -> [IO()]
+drawShapes (x:xs) = (draw x) : (drawShapes xs)
+
+drawAll list = foldr (>>) (goto (0,50)) (drawShapes list)
