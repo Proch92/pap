@@ -124,7 +124,7 @@ interpolateLine :: Shape -> [IO()]
 interpolateLine (Line (ax, ay) (bx, by)) = map (\p -> writeAt p "*") (pair (linearInterpolation ax bx 0) (linearInterpolation ay by 0))
 
 interpolateRad :: Shape -> [IO()]
-interpolateRad (Circonference center radius) = map (\p -> writeAt p "*") (pair (sinInterpolation 0 radius) (cosInterpolation 0 radius))
+interpolateRad (Circonference (centerx, centery) radius) = map (\p -> writeAt p "*") (map (\(x,y) -> (x + centerx, y + centery)) (pair (sinInterpolation 0 radius) (cosInterpolation 0 radius)))
 
 drawAll :: [Shape] -> IO()
 
@@ -150,7 +150,4 @@ instance Drawable Shape where
 	draw (Circonference center radius) = foldr (>>) (goto (0,50)) (interpolateRad (Circonference center radius))
 	draw (Composition list) = drawAll list
 
-drawShapes :: [Shape] -> [IO()]
-drawShapes (x:xs) = (draw x) : (drawShapes xs)
-
-drawAll list = foldr (>>) (goto (0,50)) (drawShapes list)
+drawAll list = foldr (>>) (goto (0,50)) (map (\x -> draw x) list)
